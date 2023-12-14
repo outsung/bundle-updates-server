@@ -41,7 +41,7 @@ export default async function Home() {
                 <span className="font-semibold">{release.releaseName}</span>
               </span>
               <span>
-                runtimeVersion:{" "}
+                version:{" "}
                 <span className="font-semibold">{release.version}</span>
               </span>
             </div>

@@ -1,12 +1,31 @@
-type ManifestDependencyType = "external" | "local" | "server";
-type ManifestDependency = {
-  type: ManifestDependencyType;
-  version: string;
+export interface Metadata {
+  version: 0;
+  bundler: "webpack" | "repack" | "vite";
+  bundleMetadata: Record<string, { path: string; hash: string }[]>;
+}
+
+export interface ModuleFederationConfig {
   url: string;
-};
-export interface Manifest {
   name: string;
+  port: string;
+  dependencies: Record<string, string>;
   version: string;
-  dependencies: Record<string, ManifestDependency>;
-  chunkMetadata?: Record<string, string>;
+}
+
+export interface ManifestBundle {
+  hash: string;
+  url: string;
+  path: string;
+}
+
+export interface Manifest {
+  id: string;
+  name: string;
+  bundler: "webpack" | "repack" | "vite";
+  platform: "ios" | "android" | "web";
+  releaseName: string;
+  version: string;
+  createdAt: string;
+  bundles: ManifestBundle[];
+  moduleFederationConfig: ModuleFederationConfig;
 }

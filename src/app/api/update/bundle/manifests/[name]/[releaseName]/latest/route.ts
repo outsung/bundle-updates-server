@@ -13,7 +13,7 @@ export async function GET(
 
   if (!name || !releaseName || !version || !platform) {
     throw new Error(
-      "Missing required parameters. Please provide values for 'name', 'releaseName', 'runtimeVersion', and 'platform'."
+      "Missing required parameters. Please provide values for 'name', 'releaseName', 'version', and 'platform'."
     );
   }
 
