@@ -36,8 +36,6 @@ export async function POST(request: Request) {
     moduleFederationConfig,
   } as Manifest;
 
-  console.log("commonManifest", commonManifest);
-
   const platforms: ("ios" | "android" | "web")[] = [];
   if (metadata.bundleMetadata.ios) {
     platforms.push("ios");
