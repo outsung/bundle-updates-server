@@ -25,11 +25,49 @@ export async function POST(request: Request) {
   const moduleFederationConfig = JSON.parse(
     formData.get("moduleFederationConfig") as string
   ) as ModuleFederationConfig;
-  const typescriptJson = (formData.getAll("typescriptJson") as File[])[0];
 
-  const { url } = await put("__types_index.json", typescriptJson, {
-    access: "public",
-  });
+  const typeFiles = formData.getAll("types") as File[];
+  const typeFileMap = new Map(typeFiles.map((t) => [t.name, t]));
+  const typeIndexJsonFile = (formData.getAll("typeIndexJson") as File[])[0];
+  const _typeIndexJson = JSON.parse(
+    Buffer.from(await typeIndexJsonFile.arrayBuffer()).toString()
+  ) as { publicPath: string; files: Record<string, string> };
+
+  const files = await Promise.all(
+    Object.entries(_typeIndexJson.files).map(async ([path, hash]) => {
+      const typeFile = typeFileMap.get(hash);
+      if (!typeFile)
+        throw new Error(
+          `Type file "${hash}" not found in uploaded type files.`
+        );
+
+      const { url } = await put(hash, typeFile, {
+        access: "public",
+        addRandomSuffix: false,
+      });
+
+      return { path, url, hash };
+    })
+  );
+
+  const typeIndexJson = JSON.stringify({ ..._typeIndexJson, files });
+
+  const { url: typeIndexJsonUrl } = await put(
+    hex2UUID(createHash(Buffer.from(typeIndexJson), "sha256", "hex")),
+    typeIndexJson,
+    { access: "public", addRandomSuffix: false }
+  );
+
+  await Promise.all(
+    typeFiles.map(async (typeFile) => {
+      const { url } = await put(`@mf-types/${typeFile.name}`, typeFile, {
+        access: "public",
+        addRandomSuffix: false,
+      });
+
+      return url;
+    })
+  );
 
   const commonManifest = {
     id: hex2UUID(createHash(Buffer.from(stringMetadata), "sha256", "hex")),
@@ -39,7 +77,7 @@ export async function POST(request: Request) {
     releaseName,
     bundler: metadata.bundler,
     moduleFederationConfig,
-    typeServeUrl: url,
+    typeIndexJsonUrl,
   } as Manifest;
 
   const platforms: ("ios" | "android" | "web")[] = [];
