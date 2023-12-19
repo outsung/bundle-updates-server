@@ -25,6 +25,11 @@ export async function POST(request: Request) {
   const moduleFederationConfig = JSON.parse(
     formData.get("moduleFederationConfig") as string
   ) as ModuleFederationConfig;
+  const typescriptJson = (formData.getAll("typescriptJson") as File[])[0];
+
+  const { url } = await put("__types_index.json", typescriptJson, {
+    access: "public",
+  });
 
   const commonManifest = {
     id: hex2UUID(createHash(Buffer.from(stringMetadata), "sha256", "hex")),
@@ -34,6 +39,7 @@ export async function POST(request: Request) {
     releaseName,
     bundler: metadata.bundler,
     moduleFederationConfig,
+    typeServeUrl: url,
   } as Manifest;
 
   const platforms: ("ios" | "android" | "web")[] = [];

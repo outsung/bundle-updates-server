@@ -28,4 +28,5 @@ export interface Manifest {
   createdAt: string;
   bundles: ManifestBundle[];
   moduleFederationConfig: ModuleFederationConfig;
+  typeServeUrl: string;
 }
