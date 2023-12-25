@@ -3,12 +3,7 @@ import { revalidatePath } from "next/cache";
 
 import { createHash, hex2UUID } from "@/lib/crypto";
 import { githubReleaseConnect } from "@/lib/githubReleaseConnect";
-import {
-  Manifest,
-  ManifestBundle,
-  Metadata,
-  ModuleFederationConfig,
-} from "@/types";
+import { Manifest, ManifestBundle, Metadata, ManifestRemote } from "@/types";
 
 export async function POST(request: Request) {
   const githubRelease = githubReleaseConnect();
@@ -22,9 +17,9 @@ export async function POST(request: Request) {
   const releaseName = formData.get("releaseName") as string;
   const stringMetadata = formData.get("metadata") as string;
   const metadata = JSON.parse(stringMetadata) as Metadata;
-  const moduleFederationConfig = JSON.parse(
-    formData.get("moduleFederationConfig") as string
-  ) as ModuleFederationConfig;
+  const remotes = JSON.parse(
+    formData.get("remotes") as string
+  ) as ManifestRemote[];
 
   const typeFiles = formData.getAll("types") as File[];
   const typeFileMap = new Map(typeFiles.map((t) => [t.name, t]));
@@ -76,7 +71,7 @@ export async function POST(request: Request) {
     version,
     releaseName,
     bundler: metadata.bundler,
-    moduleFederationConfig,
+    remotes,
     typeIndexJsonUrl,
   } as Manifest;
 

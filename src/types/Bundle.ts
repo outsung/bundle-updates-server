@@ -4,12 +4,12 @@ export interface Metadata {
   bundleMetadata: Record<string, { path: string; hash: string }[]>;
 }
 
-export interface ModuleFederationConfig {
+export interface ManifestRemote {
+  type: "local" | "server";
   url: string;
   name: string;
-  port: string;
-  dependencies: Record<string, string>;
-  version: string;
+  configName: string;
+  typeIndexJsonUrl: string;
 }
 
 export interface ManifestBundle {
@@ -27,6 +27,6 @@ export interface Manifest {
   version: string;
   createdAt: string;
   bundles: ManifestBundle[];
-  moduleFederationConfig: ModuleFederationConfig;
+  remotes: ManifestRemote[];
   typeIndexJsonUrl: string;
 }
